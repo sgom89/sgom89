@@ -1,0 +1,127 @@
+from tkinter import *
+def calculate(income):
+        if income<= 12500:
+            tax=0
+            net_pay=income - tax
+        elif income<=50000:
+            tax=(income - 12500)*0.2
+            net_pay=income - tax
+        elif income<=150000:
+            tax=(income - 50000)*0.4 + (50000-12500)*0.2
+            net_pay=income - tax
+        else:
+            tax=(income -150000)*0.45 +(150000-50000)*0.4 + (50000-12500)*0.2
+            net_pay=income - tax
+        return net_pay
+def tax_band(income):
+     if income<= 12500:
+            tax_band= "Personal allowance 0%"
+            
+     elif income<=50000:
+            tax_band=" Basic rate 20%"
+     elif income<=150000:
+            tax_band="Higher rate 40%"
+     else:
+            tax_band=" Adicional rate 45%"
+
+     return tax_band
+
+def tax_pay(income):
+      if income<= 12500:
+            tax=0
+      elif income<=50000:
+            
+            tax=(income - 12500)*0.2
+            
+      elif income<=150000:
+            
+            tax=(income - 50000)*0.4 + (50000-12500)*0.2
+            
+      else:
+           
+            tax=(income -150000)*0.45 +(150000-50000)*0.4 + (50000-12500)*0.2
+      return tax      
+def user():
+    entryField.delete(0,'end') #Clears the entire entry field from index 0 to 'end
+    entryField2.delete(0,'end')
+    name= namefield.get()
+    surname=surnamefield.get()
+    orga = orgafield.get()
+    income=incomefield.get()
+    amount = calculate(int(income))
+    band= tax_band(int(income))
+    tax= tax_pay(int(income))
+    entryer.set(name)
+    surnameer.set(surname)
+    orgameer.set(orga)
+    netpayer.set(int(amount))
+    bander.set(band)
+    taxer.set(int(tax))
+
+
+
+
+root = Tk()
+root.configure()
+root.title("Tax Calculator")
+root.resizable(1,0)
+root.columnconfigure(0,weight=1)
+root.columnconfigure(1,weight=1)
+
+entryer = StringVar()
+surnameer =StringVar()
+orgameer=StringVar()
+incomeer= StringVar()
+netpayer=StringVar()
+bander=StringVar()
+taxer=StringVar()
+entryField = Entry(root, text="Name: ",textvariable=entryer,justify=LEFT)
+entryField.grid(row=6,column=0,columnspan=5,sticky=W+E)
+entryField.columnconfigure(0,weight=5)
+entryField2 = Entry(root, textvariable=surnameer,justify=LEFT)
+entryField2.grid(row=7,column=0,columnspan=5,sticky=W+E)
+entryField2.columnconfigure(0,weight=5)
+entryField3 = Entry(root, textvariable=orgameer,justify=CENTER)
+entryField3.grid(row=8,column=0,columnspan=5,sticky=W+E)
+entryField3.columnconfigure(0,weight=5)
+entryField4 = Entry(root, textvariable=taxer,justify=CENTER)
+entryField4.grid(row=9,column=0,columnspan=5,sticky=W+E)
+entryField4.columnconfigure(0,weight=5)
+entryField5 = Entry(root, textvariable=netpayer,justify=CENTER)
+entryField5.grid(row=10,column=0,columnspan=5,sticky=W+E)
+entryField5.columnconfigure(0,weight=5)
+entryField6 = Entry(root, textvariable=taxer,justify=CENTER)
+entryField6.grid(row=11,column=0,columnspan=5,sticky=W+E)
+entryField6.columnconfigure(0,weight=5)
+entryField7 = Entry(root, textvariable=bander,justify=CENTER)
+entryField7.grid(row=11,column=0,columnspan=5,sticky=W+E)
+entryField7.columnconfigure(0,weight=5)
+#Label
+labelname = Label(root, text="Please enter name:")
+labelname.grid(row=1,column=0, sticky=W)
+labelsurname = Label(root, text="Please enter surname:")
+labelsurname.grid(row=2,column=0, sticky=W)
+labelorga = Label(root, text="Please enter your organisation:")
+labelorga.grid(row=3,column=0, sticky=W)
+labelincome = Label(root, text="Please enter your income:")
+labelincome.grid(row=4,column=0, sticky=W)
+#Entry boxes
+namefield = Entry(root)
+namefield.grid(row=1,column=1,sticky=W)
+surnamefield = Entry(root)
+surnamefield.grid(row=2,column=1,sticky=W)
+orgafield = Entry(root)
+orgafield.grid(row=3,column=1,sticky=W)
+incomefield = Entry(root,)
+incomefield.grid(row=4,column=1,sticky=W)
+
+
+button = Button(root, text="Submit", command=user,)
+button.grid(row=5, column=0, sticky=W)
+button2 = Button(root, text='Exit', command=root.destroy, )
+button2.grid(row=5, column=2, sticky=E)
+#button2 = Button(root, text='Reset', command=reset, background="Blue4")
+button2.grid(row=5, column=1,  sticky=NW)
+
+
+root.mainloop()
