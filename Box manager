@@ -1,0 +1,190 @@
+import tkinter as tk
+from tkinter import ttk
+import random
+
+class UPMSManager(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("UPMS Manager")
+        self.geometry("800x600")
+
+        # Create the main frames
+        self.top_frame = tk.Frame(self)
+        self.top_frame.pack(side="top", fill="x")
+
+        self.bottom_frame = tk.Frame(self)
+        self.bottom_frame.pack(side="bottom", fill="both", expand=True)
+
+        # Create the top frame buttons
+        self.buttons = ["Book-in", "Damaged", "Enquiry", "Search", "Lost", "Missorts", "Held Parcels", "Re-Delivery", "Returns", "Browser"]
+        for button_text in self.buttons:
+            button = tk.Button(self.top_frame, text=button_text, command=lambda t=button_text: self.display_content(t))
+            button.pack(side="left", padx=5)
+
+        # Create the book-in frame
+        self.book_in_frame = None
+        self.display_content_frame = None
+
+        # Initialize the store number counter
+        self.store_number_counter = 1
+
+        # Initialize the parcels list
+        self.parcels = []
+
+    def create_book_in_form(self):
+        self.book_in_frame = tk.Frame(self.bottom_frame)
+        self.book_in_frame.pack(fill="both", expand=True)
+
+        # Parcel ID, Store Number, Current Status, Reason
+        tk.Label(self.book_in_frame, text="Parcel ID:").grid(row=0, column=0, padx=5, pady=5)
+        self.parcel_id_entry = tk.Entry(self.book_in_frame)
+        self.parcel_id_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.generate_parcel_id()
+
+        tk.Label(self.book_in_frame, text="Store Number:").grid(row=1, column=0, padx=5, pady=5)
+        self.store_number_entry = tk.Entry(self.book_in_frame)
+        self.store_number_entry.insert(0, str(self.store_number_counter))
+        self.store_number_entry.config(state="readonly")
+
+
+        # Delivery Details
+        tk.Label(self.book_in_frame, text="Name:").grid(row=4, column=0, padx=5, pady=5)
+        self.name_entry = tk.Entry(self.book_in_frame)
+        self.name_entry.grid(row=4, column=1, padx=5, pady=5)
+
+        tk.Label(self.book_in_frame, text="Address:").grid(row=5, column=0, padx=5, pady=5)
+        self.address_entry = tk.Entry(self.book_in_frame)
+        self.address_entry.grid(row=5, column=1, padx=5, pady=5)
+
+        tk.Label(self.book_in_frame, text="PostTown:").grid(row=6, column=0, padx=5, pady=5)
+        self.posttown_entry = tk.Entry(self.book_in_frame)
+        self.posttown_entry.grid(row=6, column=1, padx=5, pady=5)
+
+        tk.Label(self.book_in_frame, text="County:").grid(row=7, column=0, padx=5, pady=5)
+        self.county_entry = tk.Entry(self.book_in_frame)
+        self.county_entry.grid(row=7, column=1, padx=5, pady=5)
+
+        tk.Label(self.book_in_frame, text="Postcode:").grid(row=8, column=0, padx=5, pady=5)
+        self.postcode_entry = tk.Entry(self.book_in_frame)
+        self.postcode_entry.grid(row=8, column=1, padx=5, pady=5)
+
+        tk.Label(self.book_in_frame, text="Reason:").grid(row=3, column=0, padx=5, pady=5)
+        self.reason_options = ["Customer not at home", "Can't find address", "Damaged", "Refused"]
+        self.reason_var = tk.StringVar()
+        self.reason_var.set(self.reason_options[0])
+        self.reason_dropdown = ttk.Combobox(self.book_in_frame, textvariable=self.reason_var, values=self.reason_options)
+        self.reason_dropdown.grid(row=3, column=1, padx=5, pady=5)
+
+        self.submit_button = tk.Button(self.book_in_frame, text="Submit", command=self.handle_book_in)
+        self.submit_button.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
+    def create_search_form(self):
+        self.search_frame = tk.Frame(self.bottom_frame)
+        self.search_frame.pack(fill="both", expand=True)
+
+        tk.Label(self.search_frame, text="Search by Parcel ID:").grid(row=0, column=0, padx=5, pady=5)
+        self.search_parcel_id_entry = tk.Entry(self.search_frame)
+        self.search_parcel_id_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        self.search_button = tk.Button(self.search_frame, text="Search", command=self.search_parcel)
+        self.search_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+
+        self.search_result_frame = tk.Frame(self.search_frame)
+        self.search_result_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+    def search_parcel(self):
+        parcel_id = self.search_parcel_id_entry.get()
+        matched_parcels = [parcel for parcel in self.parcels if parcel["parcel_id"] == parcel_id]
+
+        # Clear the previous search result
+        for widget in self.search_result_frame.winfo_children():
+            widget.destroy()
+
+        if matched_parcels:
+            for i, parcel in enumerate(matched_parcels):
+                result_label = tk.Label(self.search_result_frame, text=f"Parcel {i + 1}:\n"
+                                                                       f"Parcel ID: {parcel['parcel_id']}\n"
+                                                                       f"Store Number: {parcel['store_number']}\n"
+                                                                       f"Current Status: {parcel['current_status']}\n"
+                                                                       f"Reason: {parcel['reason']}\n"
+                                                                       f"Name: {parcel['name']}\n"
+                                                                       f"Address: {parcel['address']}\n"
+                                                                       f"PostTown: {parcel['posttown']}\n"
+                                                                       f"County: {parcel['county']}\n"
+                                                                       f"Postcode: {parcel['postcode']}")
+                result_label.pack(pady=5)
+        else:
+            result_label = tk.Label(self.search_result_frame, text="No parcels found.")
+            result_label.pack(pady=5)
+    def generate_parcel_id(self):
+        # Generate a random 8-digit Parcel ID
+        parcel_id = ''.join(random.choices('0123456789', k=8))
+        self.parcel_id_entry.delete(0, tk.END)
+        self.parcel_id_entry.insert(0, parcel_id)
+
+    def handle_book_in(self):
+        # Retrieve the values from the form
+        
+        # Retrieve the values from the form
+        parcel_id = self.parcel_id_entry.get()
+        store_number = self.store_number_entry.get()
+        name = self.name_entry.get()
+        address = self.address_entry.get()
+        posttown = self.posttown_entry.get()
+        county = self.county_entry.get()
+        postcode = self.postcode_entry.get()
+        reason = self.reason_var.get()
+        current_status = "Booked-in"  # Set the initial status as "Booked-in"
+
+        # Add the parcel to the parcels list
+        parcel = {
+            "parcel_id": parcel_id,
+            "store_number": store_number,
+            "current_status": current_status,
+            "reason": reason,
+            "name": name,
+            "address": address,
+            "posttown": posttown,
+            "county": county,
+            "postcode": postcode
+        }
+        self.parcels.append(parcel)
+
+
+        # Display the saved information
+        if self.display_content_frame is None:
+            self.display_content_frame = tk.Label(self.bottom_frame, text="")
+            self.display_content_frame.pack(fill="both", expand=True)
+        self.display_content_frame.configure(text=f"Parcel ID: {parcel_id}\nStore Number: {store_number}\nReason: {reason}\nName: {name}\nAddress: {address}\nPostTown: {posttown}\nCounty: {county}\nPostcode: {postcode}")
+
+        # Clear the form
+        self.generate_parcel_id()
+        self.store_number_counter += 1  # Increment the store number counter
+        self.store_number_entry.config(state="normal")
+        self.store_number_entry.delete(0, tk.END)
+        self.store_number_entry.insert(0, str(self.store_number_counter))
+        self.store_number_entry.config(state="readonly")
+
+        self.reason_var.set(self.reason_options[0])
+        self.name_entry.delete(0, tk.END)
+        self.address_entry.delete(0, tk.END)
+        self.posttown_entry.delete(0, tk.END)
+        self.county_entry.delete(0, tk.END)
+        self.postcode_entry.delete(0, tk.END)
+
+    def display_content(self, button_text):
+        # Clear the bottom frame
+        for widget in self.bottom_frame.winfo_children():
+            widget.destroy()
+
+        if button_text == "Book-in":
+            self.create_book_in_form()
+        elif button_text == "Search":
+            self.create_search_form()
+        else:
+            self.display_content_frame = tk.Label(self.bottom_frame, text=f"Functionality for {button_text} is not yet implemented.")
+            self.display_content_frame.pack(fill="both", expand=True)
+
+
+if __name__ == "__main__":
+    app = UPMSManager()
+    app.mainloop()
