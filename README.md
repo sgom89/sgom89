@@ -1,6 +1,6 @@
 - 👋 Hi, I’m Sergio Gomez  
-- 👀 I’m interested in Programming and cybersecurity
-- 🌱 I’m currently learning Python, HTML, CSS, cibersecurity
+- 👀 I’m interested in Data Analyst and programming in Python
+- 🌱 I’m currently learning Python, HTML, CSS, cybersecurity, Big Data
 - 📫 You can reach me in sgom5523@gmail.com
 
 
